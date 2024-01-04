@@ -1,0 +1,331 @@
+#include <iostream>
+#include<fstream>
+#include<iomanip> 
+#include<string>
+#include<io.h>  //关于文件和目录的函数
+using namespace std;
+struct player  //运动员数据定义
+{
+    
+    char name[20];    	    //姓名
+    float weight; 		   //体重
+    float height;          //身高
+    char sex[20];          //性别 
+    int number;            //号码
+    struct player *next;  //结点指针
+};
+player * create();          //声明创建链表的函数1
+void show(player *head);     //声明显示链表的函数2
+void seek(player *head,char *name);     //声明查询链表的函数3
+player * del(player *head,char *name);  //声明删除数据的函数4
+void sort(player *head);				//声明排序的函数5
+void save(player *head);      //声明保存数据的函数
+player * read();               //声明一个从磁盘读取数据的函数
+struct player *head1;    //定义一个全局头指针
+
+int main()
+{ 
+  int select;
+  char name[20]; 
+  player *stu;
+  while(true)
+  {
+   do
+    {
+     system("cls"); //清屏方法
+ cout<<"欢迎进入足球运动员管理系统!"<<endl<<endl;
+ cout<<"足球运动员管理系统"<<endl<<endl;
+ cout<<"1、请录入运动员信息                  "<<endl<<endl;
+ cout<<"2、浏览运动员信息                    "<<endl<<endl;
+ cout<<"3、查找运动员信息                    "<<endl<<endl;
+// cout<<"4、添加运动员信息                    "<<endl<<endl;
+ cout<<"4、删除运动员信息                    "<<endl<<endl;
+ cout<<"5、排序                              "<<endl<<endl; 
+ cout<<"0、退出运动员信息管理系统          "<<endl<<endl; 
+ cout<<"请根据需要选择功能（0~6)"<<endl;
+ cout<<""<<endl;
+     cin>>select;
+     if(select<0||select>=6)//开始 
+     {
+         cout<<"输了个集贸，重新选择!"<<endl;
+         system("pause") ;//windows专用 
+     }
+      
+    }while(select<0||select>=6);
+    
+    if(select==0) break;
+    switch(select)
+    {
+       case 1:
+           head1=create(); //输入数据建立链表
+           system("pause") ;//使程序暂停的方法
+           break;
+       case 2:
+           show(head1);  //显示链表数据
+           system("pause") ;
+           break;
+       case 3:
+           cout<<"输入要查找的运动员姓名：";
+           cin>>name;
+           seek(head1,name);  //在链表中根据姓名查找
+           system("pause") ;
+           break;
+       /*case 4:
+         //创建stu结点，输入数据
+        head1=add(head1,stu); //在链表中添加一个运动员记录
+           system("pause") ;
+           break;*/
+       case 4:
+           //
+           head1=del(head1,name);  //在链表删除某个运动员记录           
+           system("pause") ;
+           break;
+        case 5:
+   			sort(head1);  // 对链表中的运动员信息进行排序
+  			system("pause") ;
+    		break;
+
+      
+    }
+  }
+       save(head1);    //保存数据到文件
+}//主函数到此 
+
+
+ struct player  * create()//1
+ {   int n;
+     struct player *head,*p1,*p2;
+     head = NULL;   //在没有创建任何结点时，表头指向空
+     cout<<"输入新建运动员的人数:";
+     cin>>n;
+  for (int i=1;i<=n;i++)
+  {
+     p1=new(player);  //创建一个新的结点
+     cout<<endl<<"  请输入姓名:";
+     cin>>p1->name;
+     cout<<endl<<"  请输入体重:";
+     cin>>p1->weight;
+     cout<<endl<<"  请输入身高:";
+     cin>>p1->height;
+     cout<<endl<<"  请输入性别:";
+     cin>>p1->sex;
+     cout<<endl<<"  请输入号码:";
+     cin>>p1->number;
+	 cout<<endl; 
+     cout<<"   姓名 "<<p1->name<<" 体重 "<<p1->weight<<" 身高 "<<p1->height
+     <<" 性别 "<<p1->sex<<" 号码 "<<p1->number<<endl;
+     if (i==1)
+          {head=p1;p2=p1; }   //将链表中的第一个结点作为表头
+     else
+      {
+         p2->next=p1; //原表尾结点所指向的下一个结点应为新建结点
+          p2=p1;       //新建结点成为新的表尾结点
+      }  
+  }
+  p2->next=NULL;
+  return head;
+     }//end creat
+                                 
+								                      
+void  show(struct  player *head)   //显示信息的函数2
+{      
+    cout<<"  本系统所有运动员成绩信息如下："<<endl;
+    struct player *p;
+    p=head;
+    if(p==NULL)return;
+    do
+    {
+    cout<<"  姓名  体重  身高  性别  号码  "<<endl;
+    cout<<setw(7)<<p->name<<setw(7)<<p->weight <<setw(7)<<p->height
+    <<setw(7)<<p->sex<<setw(7)<<p->number<<endl;
+     p=p->next; //使p指向下一个结点
+    }while (p!=NULL);
+}
+
+
+void seek(player *head,char *name)  //查找运动员信息3
+{
+    struct player * p,*s;
+    int n=0;  
+    p=head;
+    if(head==NULL)
+   {
+       cout<<"该运动员不存在，请确认后输入!"<<endl;
+       
+   }
+ 
+   while(strcmp(p->name,name)!=0&&p->next!=NULL)
+   {
+       s=p;
+       p=p->next;
+   }
+                          
+  if(strcmp(p->name,name)==0)
+   {
+       cout<<"运动员信息已找到!"<<endl;
+       cout<<"  姓名  体重  身高  性别  号码  "<<endl;
+       cout<<setw(4)<<p->name<<setw(3)<<p->weight<<setw(3)<<p->height
+    <<setw(1)<<p->sex<<setw(2)<<p->number<<endl;
+       
+   }
+   else
+   {
+       cout<<"你所查询的运动员不存在！"<<endl;
+   }
+   return;
+}
+
+
+/*player * add(player *head,player *stu)  //添加数据的函数
+{
+    struct player * p0, * p1,* p2; 
+     p1=head; 
+     p0=new player; //创建一个新结点
+     cout<<endl<<"  请输入姓名:";
+     cin>>p0->name;
+     cout<<endl<<"  请输入体重:";
+     cin>>p0->weight;
+     cout<<endl<<"  请输入身高:";
+     cin>>p0->height;
+     cout<<endl<<"  请输入性别:";
+	 cin>>p0->sex;
+     cout<<endl<<"  请输入号码:";
+	 cin>>p0->number;
+     if(head==NULL) 
+      {head=p0;p0->next=NULL;} 
+else 
+{
+    while((p0->number>p1->number)&&(p1->next->next!=NULL)) 
+    {  
+        p2=p1; 
+        p1=p1->next; }
+        if(p0->number<=p1->number) 
+        {
+            if(head==p1) 
+               head=p0; 
+else
+               p2->next=p0; 
+               p0->next=p1; } 
+            else 
+            {
+                p1->next=p0; 
+                p0->next=NULL; 
+            }
+} 
+    return head;
+    
+}
+    char name[10];
+    */
+    
+    
+player * del(player *head,char *name)  //删除数据的函数4
+{
+    
+   struct player *s,*p;                  
+   p=head;
+   cout<<"请输入您要删除的运动员姓名: ";cin>>name;
+   if(head==NULL)
+   {
+       cout<<"该运动员不存在，请确认后输入!"<<endl<<"可以先浏览运动员信息（2）后再进行删除"<<endl;
+       return head;
+   }
+    while(strcmp(p->name, name)!=0&&p->next!=NULL)
+   {
+       s=p;
+       p=p->next;
+       }if(strcmp(p->name,name)==0)
+   {
+       if(p==head)
+           head=p->next;
+       else
+           s->next=p->next;
+       cout<<"删除成功!"<<endl;
+   }
+       
+       else
+               cout<<"您输入运动员不存在，请确认后输入!"<<endl;
+       return head;
+}
+
+
+void sort(player *head) {   //根据号码进行排序5 
+    player *p, *q;
+    for (p = head; p != NULL; p = p->next) {
+        for (q = p->next; q != NULL; q = q->next) {
+            if (p->number > q->number) {  
+			          
+                player temp = *p;			// 交换 p 和 q 指向的运动员的信息
+                *p = *q;
+                *q = temp;               	
+
+
+                temp.next = p->next;		 // 交换回 next 指针
+                p->next = q->next;
+                q->next = temp.next;
+            }
+        }
+    }
+    cout<<"已根据号码进行排序，请重新浏览运动员信息"<<endl; 
+}
+
+
+void save(player *head)      //这个函数的主要作用是保存链表中的数据到一个二进制文件中，以便以后可以重新加载这些数据
+{
+    player *p;						//定义一个名为 p 的指针，用于遍历链表
+    fstream file;                  // 定义文件流对象
+    p=head;							//将 head 指针的值赋给 p，使 p 指向链表的头部
+    
+    file.open("player.dat",ios::binary|ios::out); // 为读写打开二进制文件
+    if(!file)						//如果文件打开失败，输出错误信息并退出程序
+    {
+        cout<< ("cannot open file\n");
+        exit(0);
+    }
+    if(p==NULL)    					//链表为空，直接返回，无操作 
+            return;
+    
+    do
+    { 
+        file.write((char*)p,sizeof(player)); // 将数据写入文件
+        p=p->next;    //使p指向下一个结点
+    }while(p!=NULL);
+    
+    file.close();  //关闭文件
+    
+}
+    
+    
+player * read()               //从磁盘读取数据的函数
+{
+    player *head,*p1,*p2;		//定义了三个 player 类型的指针 head、p1 和 p2。head 用于存储链表的头节点，p1 和 p2 用于在创建链表时临时存储节点 
+    fstream file;                  // 定义文件流对象
+    int n=1;
+    head=NULL;
+    file.open("student.dat",ios::binary|ios::in); // 为读写打开二进制文件
+    if(!file)									//如果文件打开失败，输出错误信息并退出程序
+    {
+        cout<< ("cannot open file\n");		
+        exit(0);
+    }
+    p1=new player;					//创建一个新的 player 对象，并用 p1 指向它 
+    while(file.read((char*)p1,sizeof(player)))//从文件中读取 player 对象的大小的数据，并存储到 p1 所指向的对象中。如果读取成功，则继续执行循环体；否则，退出循环 
+    {
+        if (n == 1)
+        {
+            head = p1;				 // 将链表中第一个新建结点作为表头 
+            p2 = p1;
+        }
+        else
+        {
+            p2->next = p1; p2 = p1;
+        } 
+        p1=new player;				//在每次循环的最后，创建一个新的 player 对象，并用 p1 指向它
+        n++;
+    }
+    delete p1;						//退出循环后，删除最后创建的 player 对象，因为这个对象没有被使用
+    p2->next =NULL;					//将链表的最后一个节点的 next 指针设置为 NULL
+    
+    file.close(); 				 //关闭文件
+    return head;
+}
